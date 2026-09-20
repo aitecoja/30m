@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#10151b">
+<meta name="mobile-web-app-capable" content="yes">
+<title>30 m ajanotto</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="app">
+
+  <header class="bar bar--top">
+    <button id="athleteBtn" class="chip" type="button">Ei urheilijaa</button>
+    <span id="fpsReadout" class="chip chip--quiet">–</span>
+    <button id="menuBtn" class="chip" type="button">Valikko</button>
+  </header>
+
+  <main id="stage">
+    <video id="preview" playsinline muted autoplay></video>
+    <canvas id="overlay"></canvas>
+
+    <div id="camPrompt" class="prompt">
+      <p class="prompt__text">Aseta puhelin telineeseen ennen kameran käynnistämistä.</p>
+      <button id="startCamBtn" class="btn btn--primary btn--huge" type="button">Käynnistä kamera</button>
+      <p id="camError" class="prompt__error" hidden></p>
+    </div>
+
+    <div id="hud" hidden>
+      <div id="statusLine" class="status">Rajaa lähtö- ja maalialue</div>
+      <div id="timeReadout" class="time">0,00</div>
+      <div id="uncertainty" class="uncert"></div>
+      <div id="meters" class="meters">
+        <div class="meter">
+          <span class="meter__name">Lähtö</span>
+          <div class="meter__track"><div id="meterStart" class="meter__fill"></div></div>
+        </div>
+        <div class="meter">
+          <span class="meter__name">Maali</span>
+          <div class="meter__track"><div id="meterFinish" class="meter__fill"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="drawHint" class="drawhint" hidden>Vedä sormella suorakulmio</div>
+  </main>
+
+  <footer class="bar bar--bottom">
+    <button id="roiStartBtn" class="btn" type="button">Lähtöalue</button>
+    <button id="roiFinishBtn" class="btn" type="button">Maalialue</button>
+    <button id="armBtn" class="btn btn--primary btn--wide" type="button" disabled>Viritä</button>
+    <button id="cancelBtn" class="btn" type="button" hidden>Keskeytä</button>
+    <button id="reviewBtn" class="btn" type="button" hidden>Tarkista video</button>
+    <button id="discardBtn" class="btn" type="button" hidden>Hylkää</button>
+    <button id="saveBtn" class="btn btn--primary btn--wide" type="button" hidden>Tallenna</button>
+  </footer>
+
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<!-- Valikko -->
+<dialog id="menuDialog" class="sheet">
+  <h2>Valikko</h2>
+  <div class="stack">
+    <button class="btn btn--wide" type="button" data-open="athleteDialog">Urheilijat</button>
+    <button class="btn btn--wide" type="button" data-open="historyDialog">Historia ja tulokset</button>
+    <button class="btn btn--wide" type="button" data-open="settingsDialog">Asetukset</button>
+    <button id="fullscreenBtn" class="btn btn--wide" type="button">Kokoruutu</button>
+    <button id="exportBtn" class="btn btn--wide" type="button">Vie CSV-tiedostoon</button>
+    <button class="btn btn--wide btn--quiet" type="button" data-close>Sulje</button>
+  </div>
+  <p class="fineprint">30 m ajanotto · versio 1.0.0 · toimii ilman verkkoa</p>
+</dialog>
+
+<!-- Urheilijat -->
+<dialog id="athleteDialog" class="sheet">
+  <h2>Urheilijat</h2>
+  <div class="row">
+    <input id="newAthleteName" class="field" type="text" placeholder="Nimi" autocomplete="off" maxlength="40">
+    <button id="addAthleteBtn" class="btn" type="button">Lisää</button>
+  </div>
+  <ul id="athleteList" class="list"></ul>
+  <button class="btn btn--wide btn--quiet" type="button" data-close>Sulje</button>
+</dialog>
+
+<!-- Historia -->
+<dialog id="historyDialog" class="sheet sheet--tall">
+  <h2 id="historyTitle">Historia</h2>
+  <div id="sessionSummary" class="summary"></div>
+  <div id="trendWrap" class="trend"></div>
+  <ul id="runList" class="list"></ul>
+  <button class="btn btn--wide btn--quiet" type="button" data-close>Sulje</button>
+</dialog>
+
+<!-- Asetukset -->
+<dialog id="settingsDialog" class="sheet sheet--tall">
+  <h2>Asetukset</h2>
+
+  <label class="setting">
+    <span class="setting__name">Maalin suoja-aika</span>
+    <span class="setting__help">Maalialue alkaa tunnistaa vasta tämän ajan kuluttua lähdöstä. Estää sen, että lähtevä juoksija tai avustaja laukaisee maalin.</span>
+    <input id="setGuard" class="field" type="number" min="0" max="20" step="0.5">
+  </label>
+
+  <label class="setting">
+    <span class="setting__name">Juoksun enimmäiskesto</span>
+    <span class="setting__help">Jos maalia ei havaita tässä ajassa, mittaus keskeytyy itsestään.</span>
+    <input id="setMaxRun" class="field" type="number" min="5" max="120" step="1">
+  </label>
+
+  <label class="setting">
+    <span class="setting__name">Pikselin muutosherkkyys</span>
+    <span class="setting__help">Kuinka paljon yksittäisen pikselin kirkkauden on muututtava, jotta se lasketaan liikkeeksi. Pienempi luku on herkempi. Oletus 18.</span>
+    <input id="setPixel" class="field" type="number" min="4" max="80" step="1">
+  </label>
+
+  <label class="setting">
+    <span class="setting__name">Liikkeen vähimmäisosuus</span>
+    <span class="setting__help">Kuinka suuren osan rajatusta alueesta on muututtava. 0,06 tarkoittaa kuutta prosenttia. Nosta lukua, jos mittaus laukeaa itsestään.</span>
+    <input id="setArea" class="field" type="number" min="0.01" max="0.6" step="0.01">
+  </label>
+
+  <label class="setting">
+    <span class="setting__name">Taustan mukautumisnopeus</span>
+    <span class="setting__help">Kuinka nopeasti vertailukuva seuraa valon muutoksia. Suurempi luku sietää paremmin vaihtelevaa valoa mutta tekee mittauksesta tylsemmän hitaalle liikkeelle. Oletus 0,02.</span>
+    <input id="setAdapt" class="field" type="number" min="0.002" max="0.3" step="0.002">
+  </label>
+
+  <label class="setting setting--row">
+    <input id="setRecord" type="checkbox">
+    <span>
+      <span class="setting__name">Tallenna video jälkitarkastusta varten</span>
+      <span class="setting__help">Video säilyy vain nykyisen tuloksen ajan, ei historiassa.</span>
+    </span>
+  </label>
+
+  <label class="setting setting--row">
+    <input id="setSound" type="checkbox">
+    <span class="setting__name">Merkkiäänet</span>
+  </label>
+
+  <label class="setting setting--row">
+    <input id="setVibrate" type="checkbox">
+    <span class="setting__name">Värinä</span>
+  </label>
+
+  <div class="stack">
+    <button id="resetSettingsBtn" class="btn btn--wide btn--quiet" type="button">Palauta oletukset</button>
+    <button class="btn btn--wide" type="button" data-close>Valmis</button>
+  </div>
+</dialog>
+
+<!-- Videon jälkitarkastus -->
+<dialog id="reviewDialog" class="sheet sheet--tall">
+  <h2>Jälkitarkastus</h2>
+  <video id="reviewVideo" class="review__video" playsinline muted></video>
+  <div class="review__time">
+    <span>Ruutu</span>
+    <strong id="reviewFrameTime">0,000 s</strong>
+  </div>
+  <input id="reviewScrub" class="scrub" type="range" min="0" max="1000" value="0" step="1">
+  <div class="row row--even">
+    <button id="reviewPrev" class="btn" type="button">‹ Ruutu</button>
+    <button id="reviewNext" class="btn" type="button">Ruutu ›</button>
+  </div>
+  <div class="row row--even">
+    <button id="markStartBtn" class="btn" type="button">Merkitse lähtö</button>
+    <button id="markFinishBtn" class="btn" type="button">Merkitse maali</button>
+  </div>
+  <p id="reviewMarks" class="review__marks">Lähtö: – · Maali: –</p>
+  <div class="stack">
+    <button id="applyReviewBtn" class="btn btn--primary btn--wide" type="button" disabled>Käytä korjattua aikaa</button>
+    <button class="btn btn--wide btn--quiet" type="button" data-close>Peruuta</button>
+  </div>
+</dialog>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
