@@ -178,16 +178,29 @@ async function startCamera() {
     return;
   }
 
+  // Pyynnöt tärkeysjärjestyksessä. Jos puhelin hylkää tarkemman pyynnön,
+  // kokeillaan seuraavaa. Viimeinen pyytää vain takakameraa ilman muita ehtoja.
+  const attempts = [
+    { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 60 } },
+    { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+    { facingMode: { ideal: 'environment' } },
+    true
+  ];
+
   try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      audio: false,
-      video: {
-        facingMode: { ideal: 'environment' },
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
-        frameRate: { ideal: 60, min: 24 }
+    let lastError = null;
+    stream = null;
+    for (const video of attempts) {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: false, video });
+        break;
+      } catch (err) {
+        lastError = err;
+        // Luvan epääminen ei korjaudu uudella yrityksellä.
+        if (err && (err.name === 'NotAllowedError' || err.name === 'SecurityError')) throw err;
       }
-    });
+    }
+    if (!stream) throw lastError || new Error('Kamera ei käynnistynyt');
   } catch (err) {
     if (err && (err.name === 'NotAllowedError' || err.name === 'SecurityError')) {
       showCameraError('Kameran käyttö estettiin. Salli kamera selaimen osoiterivin lukkokuvakkeesta ja yritä uudelleen.');

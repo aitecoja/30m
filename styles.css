@@ -27,6 +27,10 @@
 
 * { box-sizing: border-box; }
 
+/* hidden-attribuutin on voitettava aina, myös luokat joilla on oma display-sääntö.
+   Ilman tätä kameran aloitusruutu jäisi peittämään kuvan. */
+[hidden] { display: none !important; }
+
 html, body {
   height: 100%;
   margin: 0;
