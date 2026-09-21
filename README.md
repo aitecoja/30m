@@ -106,7 +106,7 @@ molemmilla alueilla.
    Mitä tiukempi rajaus, sitä varmempi tunnistus.
 3. **Maalialue.** Vedä kapea pystykaistale maaliviivan kohdalle. Pidä se kapeana —
    leveä alue laukeaa liian aikaisin.
-4. **Viritä.** Sovellus opettelee taustan noin 1,5 sekunnin ajan, sitten näyttö
+4. **Mittaa.** Sovellus opettelee taustan noin 1,5 sekunnin ajan, sitten näyttö
    kertoo "Odottaa lähtöä".
 5. Juoksija lähtee omaan tahtiinsa. Liike lähtöalueella käynnistää kellon.
 6. Maali pysäyttää kellon. **Tallenna** tai **Hylkää**.

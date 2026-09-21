@@ -63,7 +63,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px var(--pad);
+  padding: 6px var(--pad);
   background: var(--surface);
   flex: 0 0 auto;
 }
@@ -235,9 +235,11 @@ body {
   background: var(--surface-hi);
   color: var(--text);
   border-radius: var(--radius);
-  padding: 14px 16px;
-  min-height: 56px;
+  /* Mitat 75 % alkuperäisestä (56 px → 42 px). Teksti pidetään luettavana. */
+  padding: 10px 12px;
+  min-height: 42px;
   font: inherit;
+  font-size: 0.94rem;
   font-weight: 650;
   cursor: pointer;
   flex: 1 1 auto;
@@ -257,9 +259,9 @@ body {
 .btn--quiet { background: transparent; color: var(--muted); }
 
 .btn--huge {
-  min-height: 78px;
-  font-size: 1.3rem;
-  padding: 18px 34px;
+  min-height: 58px;
+  font-size: 1.1rem;
+  padding: 13px 26px;
   flex: 0 0 auto;
 }
 

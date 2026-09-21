@@ -2,7 +2,7 @@
 // Kun muutat lähdetiedostoja, nosta CACHE_NAMEn versionumeroa,
 // muuten puhelin näyttää vanhan version välimuistista.
 
-const CACHE_NAME = 'sprint30-v2';
+const CACHE_NAME = 'sprint30-v3';
 
 const ASSETS = [
   './',

@@ -478,7 +478,7 @@ function processFrame(t) {
       const triggered = startTrigger.feed(scoreStart, area, t);
       if (triggered !== null) beginRun(triggered);
     } else {
-      statusLineEl.textContent = 'Viritetään taustaa…';
+      statusLineEl.textContent = 'Valmistellaan…';
     }
   } else if (state === STATE.RUNNING) {
     const scoreFinish = finishDetector.update(previewEl, px, adapt);
@@ -553,7 +553,7 @@ function arm() {
   timeReadoutEl.textContent = '0,00';
   uncertaintyEl.textContent = '';
   setState(STATE.ARMED);
-  statusLineEl.textContent = 'Viritetään taustaa…';
+  statusLineEl.textContent = 'Valmistellaan…';
   beep(660, 90);
   buzz(40);
 
