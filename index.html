@@ -15,12 +15,6 @@
 
 <div id="app">
 
-  <header class="bar bar--top">
-    <button id="athleteBtn" class="chip" type="button">Ei urheilijaa</button>
-    <span id="fpsReadout" class="chip chip--quiet">–</span>
-    <button id="menuBtn" class="chip" type="button">Valikko</button>
-  </header>
-
   <main id="stage">
     <video id="preview" playsinline muted autoplay></video>
     <canvas id="overlay"></canvas>
@@ -51,6 +45,8 @@
   </main>
 
   <footer class="bar bar--bottom">
+    <button id="athleteBtn" class="chip" type="button">Ei urheilijaa</button>
+    <span id="fpsReadout" class="chip chip--quiet">–</span>
     <button id="roiStartBtn" class="btn" type="button">Lähtöalue</button>
     <button id="roiFinishBtn" class="btn" type="button">Maalialue</button>
     <button id="armBtn" class="btn btn--primary btn--wide" type="button" disabled>Mittaa</button>
@@ -58,6 +54,7 @@
     <button id="reviewBtn" class="btn" type="button" hidden>Tarkista video</button>
     <button id="discardBtn" class="btn" type="button" hidden>Hylkää</button>
     <button id="saveBtn" class="btn btn--primary btn--wide" type="button" hidden>Tallenna</button>
+    <button id="menuBtn" class="chip" type="button">Valikko</button>
   </footer>
 
 </div>

@@ -101,7 +101,11 @@ molemmilla alueilla.
 
 ## Käyttö
 
-1. **Käynnistä kamera.** Suuntaa ja lukitse teline.
+1. **Käynnistä kamera.** Suuntaa ja lukitse teline lopulliseen asentoonsa
+   **ennen** alueiden rajaamista. Alueet tallentuvat kuvan koordinaatteina, ja
+   puhelimen kääntäminen kääntää myös kuvan. Vaaka-asennossa kuva täyttää koko
+   leveyden ja sen ylä- ja alareunasta rajautuu osa pois näkyvistä; rajaa alueet
+   näkyvään osaan.
 2. **Lähtöalue.** Vedä sormella tiukka suorakulmia juoksijan lähtöasennon ympärille.
    Mitä tiukempi rajaus, sitä varmempi tunnistus.
 3. **Maalialue.** Vedä kapea pystykaistale maaliviivan kohdalle. Pidä se kapeana —

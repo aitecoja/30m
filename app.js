@@ -264,13 +264,23 @@ function applyStoredRois() {
   updateControls();
 }
 
-/** Videon todellinen näyttöalue, kun object-fit: contain jättää mustat reunat. */
+// Sama ehto kuin styles.css:ssä: vaaka-asennossa object-fit: cover.
+const landscapeQuery = window.matchMedia('(orientation: landscape)');
+
+/**
+ * Videon todellinen näyttöalue elementin sisällä.
+ * Pystyasennossa (contain) kuva voi jättää mustat reunat, vaaka-asennossa (cover)
+ * kuva on elementtiä suurempi ja osa siitä on näkyvän alueen ulkopuolella.
+ */
 function displayRect() {
   const rect = previewEl.getBoundingClientRect();
   const vw = previewEl.videoWidth;
   const vh = previewEl.videoHeight;
   if (!vw || !vh) return { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
-  const scale = Math.min(rect.width / vw, rect.height / vh);
+  const cover = landscapeQuery.matches;
+  const scale = cover
+    ? Math.max(rect.width / vw, rect.height / vh)
+    : Math.min(rect.width / vw, rect.height / vh);
   const width = vw * scale;
   const height = vh * scale;
   return {

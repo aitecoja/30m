@@ -47,14 +47,13 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Kamera ulottuu näytön reunasta reunaan. Turva-alueet huomioidaan vain
+   alapalkissa, jotta painikkeet eivät jää kameran lovon tai eleviivan alle. */
 #app {
   display: flex;
   flex-direction: column;
   height: 100%;
   padding-top: var(--safe-top);
-  padding-bottom: var(--safe-bottom);
-  padding-left: var(--safe-left);
-  padding-right: var(--safe-right);
 }
 
 /* --- Palkit --- */
@@ -63,13 +62,13 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px var(--pad);
   background: var(--surface);
   flex: 0 0 auto;
 }
 
-.bar--top { border-bottom: 1px solid var(--line); }
 .bar--bottom {
+  gap: 6px;
+  padding: 6px calc(var(--pad) + var(--safe-right)) calc(6px + var(--safe-bottom)) calc(var(--pad) + var(--safe-left));
   border-top: 1px solid var(--line);
   flex-wrap: wrap;
 }
@@ -80,22 +79,28 @@ body {
   background: var(--surface-hi);
   color: var(--text);
   border-radius: 999px;
-  padding: 8px 14px;
+  padding: 8px 12px;
   font: inherit;
+  font-size: 0.94rem;
   font-weight: 600;
-  min-height: 40px;
+  min-height: 42px;
+  flex: 0 0 auto;
   cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-#athleteBtn { flex: 1 1 auto; text-align: left; max-width: 55%; }
+#athleteBtn { flex: 0 1 auto; max-width: 11em; }
 .chip--quiet {
   background: transparent;
+  border-color: transparent;
   color: var(--muted);
+  padding: 8px 4px;
   font-variant-numeric: tabular-nums;
   font-weight: 500;
+  display: inline-flex;
+  align-items: center;
 }
 
 /* --- Näyttämö --- */
@@ -118,6 +123,12 @@ body {
 }
 
 #preview { object-fit: contain; background: #000; }
+
+/* Vaaka-asennossa kuva täyttää koko leveyden. Ylä- ja alareunasta rajautuu
+   osa pois näkyvistä, mutta tunnistus käsittelee silti koko kuvan. */
+@media (orientation: landscape) {
+  #preview { object-fit: cover; }
+}
 #overlay { pointer-events: none; }
 
 /* HUD */
@@ -415,7 +426,7 @@ input:focus-visible {
 .toast {
   position: fixed;
   left: 50%;
-  bottom: calc(96px + var(--safe-bottom));
+  bottom: calc(72px + var(--safe-bottom));
   transform: translateX(-50%);
   background: var(--surface-hi);
   border: 1px solid var(--line);
